@@ -1,78 +1,65 @@
 {
     "openapi": "3.0.0",
     "info": {
-        "title": "School API Documentation",
-        "description": "School API Documentation",
+        "title": "Laravel Students API",
+        "description": "API for managing students",
+        "contact": {
+            "email": "admin@example.com"
+        },
         "version": "1.0.0"
     },
-    "servers": [
-        {
-            "url": "https://laravel-sqlite-api-swagger-mze.azurewebsites.net/api",
-            "description": "production server"
-        },
-        {
-            "url": "https://laravel-sqlite-api-swagger-mze.azurewebsites.net/api",
-            "description": "staging server"
-        },
-        {
-            "url": "http://127.0.0.1:8000/api",
-            "description": "local server"
-        }
-    ],
     "paths": {
-        "/students": {
+        "/api/students": {
             "get": {
                 "tags": [
-                    "STUDENTS"
+                    "Students"
                 ],
                 "summary": "Get all students",
-                "description": "Get list of all students.",
-                "operationId": "10a7a2748a19a0b6408ce47b4dad30cf",
+                "description": "Display a listing of the resource.",
+                "operationId": "944b18b2938371d3a49103c865f5aed9",
                 "responses": {
                     "200": {
-                        "description": "Students retrieved successfully"
+                        "description": "List of all students",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Student"
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             },
             "post": {
                 "tags": [
-                    "STUDENTS"
+                    "Students"
                 ],
                 "summary": "Create a new student",
-                "description": "Create a new student with the provided data.",
-                "operationId": "9f810050cb0d39be8467737e16f8e638",
+                "description": "Store a newly created resource in storage.",
+                "operationId": "55c75624de9d3fe47487bf48df409809",
                 "requestBody": {
                     "required": true,
                     "content": {
                         "application/json": {
                             "schema": {
-                                "required": [
-                                    "FirstName",
-                                    "LastName",
-                                    "School"
-                                ],
-                                "properties": {
-                                    "FirstName": {
-                                        "type": "string",
-                                        "example": "John"
-                                    },
-                                    "LastName": {
-                                        "type": "string",
-                                        "example": "Doe"
-                                    },
-                                    "School": {
-                                        "type": "string",
-                                        "example": "BCIT"
-                                    }
-                                },
-                                "type": "object"
+                                "$ref": "#/components/schemas/StudentRequest"
                             }
                         }
                     }
                 },
                 "responses": {
                     "201": {
-                        "description": "Student created successfully"
+                        "description": "Student created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Student"
+                                }
+                            }
+                        }
                     },
                     "422": {
                         "description": "Validation error"
@@ -80,19 +67,19 @@
                 }
             }
         },
-        "/students/{id}": {
+        "/api/students/{id}": {
             "get": {
                 "tags": [
-                    "STUDENTS"
+                    "Students"
                 ],
-                "summary": "Get a specific student",
-                "description": "Get details of a specific student by ID.",
-                "operationId": "33fb213ca5bb7d9fcd7a5906e733fe48",
+                "summary": "Get a student by ID",
+                "description": "Display the specified resource.",
+                "operationId": "3d03685fc4e68bbf325c181306b4a037",
                 "parameters": [
                     {
                         "name": "id",
                         "in": "path",
-                        "description": "ID of the student",
+                        "description": "Student ID",
                         "required": true,
                         "schema": {
                             "type": "integer"
@@ -101,7 +88,14 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Student details retrieved successfully"
+                        "description": "Student details",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Student"
+                                }
+                            }
+                        }
                     },
                     "404": {
                         "description": "Student not found"
@@ -110,16 +104,16 @@
             },
             "put": {
                 "tags": [
-                    "STUDENTS"
+                    "Students"
                 ],
                 "summary": "Update a student",
-                "description": "Update details of a specific student by ID.",
-                "operationId": "3bd57a1c87d9ca62ca8cbb16712c6c13",
+                "description": "Update the specified resource in storage.",
+                "operationId": "c29610976f0d6bce915b31aee0e85a2f",
                 "parameters": [
                     {
                         "name": "id",
                         "in": "path",
-                        "description": "ID of the student",
+                        "description": "Student ID",
                         "required": true,
                         "schema": {
                             "type": "integer"
@@ -131,33 +125,26 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "required": [
-                                    "FirstName",
-                                    "LastName",
-                                    "School"
-                                ],
-                                "properties": {
-                                    "FirstName": {
-                                        "type": "string",
-                                        "example": "Jane"
-                                    },
-                                    "LastName": {
-                                        "type": "string",
-                                        "example": "Smith"
-                                    },
-                                    "School": {
-                                        "type": "string",
-                                        "example": "UBC"
-                                    }
-                                },
-                                "type": "object"
+                                "$ref": "#/components/schemas/StudentRequest"
                             }
                         }
                     }
                 },
                 "responses": {
                     "200": {
-                        "description": "Student updated successfully"
+                        "description": "Update result",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     },
                     "404": {
                         "description": "Student not found"
@@ -169,16 +156,16 @@
             },
             "delete": {
                 "tags": [
-                    "STUDENTS"
+                    "Students"
                 ],
                 "summary": "Delete a student",
-                "description": "Delete a specific student by ID.",
-                "operationId": "40b13ab0a3803f505f2d18906bb8bc00",
+                "description": "Remove the specified resource from storage.",
+                "operationId": "d96ee6ae75daa51d0106f3146837dc86",
                 "parameters": [
                     {
                         "name": "id",
                         "in": "path",
-                        "description": "ID of the student to delete",
+                        "description": "Student ID",
                         "required": true,
                         "schema": {
                             "type": "integer"
@@ -187,7 +174,19 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Student deleted successfully"
+                        "description": "Delete result",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     },
                     "404": {
                         "description": "Student not found"
@@ -197,18 +196,64 @@
         }
     },
     "components": {
-        "securitySchemes": {
-            "bearerAuth": {
-                "type": "http",
-                "name": "Authorization",
-                "in": "header"
+        "schemas": {
+            "Student": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "FirstName": {
+                        "type": "string",
+                        "example": "John"
+                    },
+                    "LastName": {
+                        "type": "string",
+                        "example": "Doe"
+                    },
+                    "School": {
+                        "type": "string",
+                        "example": "BCIT"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "StudentRequest": {
+                "required": [
+                    "FirstName",
+                    "LastName",
+                    "School"
+                ],
+                "properties": {
+                    "FirstName": {
+                        "type": "string",
+                        "example": "John"
+                    },
+                    "LastName": {
+                        "type": "string",
+                        "example": "Doe"
+                    },
+                    "School": {
+                        "type": "string",
+                        "example": "BCIT"
+                    }
+                },
+                "type": "object"
             }
         }
     },
     "tags": [
         {
-            "name": "STUDENTS",
-            "description": "STUDENTS"
+            "name": "Students",
+            "description": "Student management endpoints"
         }
     ]
 }

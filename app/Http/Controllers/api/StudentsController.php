@@ -5,24 +5,50 @@ namespace App\Http\Controllers\api;
 use App\Http\Controllers\Controller;
 use App\Models\Student;
 use Illuminate\Http\Request;
+use OpenApi\Attributes as OA;
 
+#[OA\Tag(name: 'Students', description: 'Student management endpoints')]
+#[OA\Schema(
+    schema: 'Student',
+    properties: [
+        new OA\Property(property: 'id', type: 'integer', example: 1),
+        new OA\Property(property: 'FirstName', type: 'string', example: 'John'),
+        new OA\Property(property: 'LastName', type: 'string', example: 'Doe'),
+        new OA\Property(property: 'School', type: 'string', example: 'BCIT'),
+        new OA\Property(property: 'created_at', type: 'string', format: 'date-time'),
+        new OA\Property(property: 'updated_at', type: 'string', format: 'date-time'),
+    ]
+)]
+
+#[OA\Schema(
+    schema: 'StudentRequest',
+    required: ['FirstName', 'LastName', 'School'],
+    properties: [
+        new OA\Property(property: 'FirstName', type: 'string', example: 'John'),
+        new OA\Property(property: 'LastName', type: 'string', example: 'Doe'),
+        new OA\Property(property: 'School', type: 'string', example: 'BCIT'),
+    ]
+)]
 class StudentsController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-
-    /**
-     * 
-     * 
-    * @OA\Get(
-    *     path="/students",
-    *     tags={"STUDENTS"},
-    *     summary="Get all students",
-    *     description="Get list of all students.",
-    *     @OA\Response(response=200, description="Students retrieved successfully")
-    * )
-    */
+    #[OA\Get(
+        path: '/api/students',
+        tags: ['Students'],
+        summary: 'Get all students',
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'List of all students',
+                content: new OA\JsonContent(
+                    type: 'array',
+                    items: new OA\Items(ref: '#/components/schemas/Student')
+                )
+            ),
+        ]
+    )]
     public function index()
     {
         return Student::all();
@@ -31,26 +57,23 @@ class StudentsController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-
-    /**
-    * @OA\Post(
-    *     path="/students",
-    *     tags={"STUDENTS"},
-    *     summary="Create a new student",
-    *     description="Create a new student with the provided data.",
-    *     @OA\RequestBody(
-    *         required=true,
-    *         @OA\JsonContent(
-    *             required={"FirstName","LastName","School"},
-    *             @OA\Property(property="FirstName", type="string", example="John"),
-    *             @OA\Property(property="LastName", type="string", example="Doe"),
-    *             @OA\Property(property="School", type="string", example="BCIT")
-    *         )
-    *     ),
-    *     @OA\Response(response=201, description="Student created successfully"),
-    *     @OA\Response(response=422, description="Validation error")
-    * )
-    */
+    #[OA\Post(
+        path: '/api/students',
+        tags: ['Students'],
+        summary: 'Create a new student',
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(ref: '#/components/schemas/StudentRequest')
+        ),
+        responses: [
+            new OA\Response(
+                response: 201,
+                description: 'Student created successfully',
+                content: new OA\JsonContent(ref: '#/components/schemas/Student')
+            ),
+            new OA\Response(response: 422, description: 'Validation error'),
+        ]
+    )]
     public function store(Request $request)
     {
         // validate input
@@ -60,88 +83,68 @@ class StudentsController extends Controller
             'School' => 'required',
         ]);
 
-        $student = Student::create([
+        return Student::create([
             'FirstName' => request('FirstName'),
             'LastName' => request('LastName'),
             'School' => request('School'),
         ]);
-        
-        return response()->json($student, 201);
+
     }
 
     /**
      * Display the specified resource.
      */
-
-
-    /**
-    * @OA\Get(
-    *     path="/students/{id}",
-    *     tags={"STUDENTS"},
-    *     summary="Get a specific student",
-    *     description="Get details of a specific student by ID.",
-    *     @OA\Parameter(
-    *         name="id",
-    *         in="path",
-    *         required=true,
-    *         description="ID of the student",
-    *         @OA\Schema(type="integer")
-    *     ),
-    *     @OA\Response(response=200, description="Student details retrieved successfully"),
-    *     @OA\Response(response=404, description="Student not found")
-    * )
-    */
-    public function show($id)
+    #[OA\Get(
+        path: '/api/students/{id}',
+        tags: ['Students'],
+        summary: 'Get a student by ID',
+        parameters: [
+            new OA\Parameter(name: 'id', in: 'path', required: true, description: 'Student ID',
+                schema: new OA\Schema(type: 'integer')),
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Student details',
+                content: new OA\JsonContent(ref: '#/components/schemas/Student')
+            ),
+            new OA\Response(response: 404, description: 'Student not found'),
+        ]
+    )]
+    public function show(Student $student)
     {
-        $student = Student::find($id);
-        
-        if (!$student) {
-            return response()->json(['message' => 'Student not found'], 404);
-        }
-        
-        return response()->json($student);
+        return $student;
     }
 
     /**
      * Update the specified resource in storage.
      */
-
-    /**
-    * @OA\Put(
-    *     path="/students/{id}",
-    *     tags={"STUDENTS"},
-    *     summary="Update a student",
-    *     description="Update details of a specific student by ID.",
-    *     @OA\Parameter(
-    *         name="id",
-    *         in="path",
-    *         required=true,
-    *         description="ID of the student",
-    *         @OA\Schema(type="integer")
-    *     ),
-    *     @OA\RequestBody(
-    *         required=true,
-    *         @OA\JsonContent(
-    *             required={"FirstName","LastName","School"},
-    *             @OA\Property(property="FirstName", type="string", example="Jane"),
-    *             @OA\Property(property="LastName", type="string", example="Smith"),
-    *             @OA\Property(property="School", type="string", example="UBC")
-    *         )
-    *     ),
-    *     @OA\Response(response=200, description="Student updated successfully"),
-    *     @OA\Response(response=404, description="Student not found"),
-    *     @OA\Response(response=422, description="Validation error")
-    * )
-    */
-    public function update(Request $request, $id)
+    #[OA\Put(
+        path: '/api/students/{id}',
+        tags: ['Students'],
+        summary: 'Update a student',
+        parameters: [
+            new OA\Parameter(name: 'id', in: 'path', required: true, description: 'Student ID',
+                schema: new OA\Schema(type: 'integer')),
+        ],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(ref: '#/components/schemas/StudentRequest')
+        ),
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Update result',
+                content: new OA\JsonContent(
+                    properties: [new OA\Property(property: 'success', type: 'boolean')]
+                )
+            ),
+            new OA\Response(response: 404, description: 'Student not found'),
+            new OA\Response(response: 422, description: 'Validation error'),
+        ]
+    )]
+    public function update(Request $request, Student $student)
     {
-        $student = Student::find($id);
-        
-        if (!$student) {
-            return response()->json(['message' => 'Student not found'], 404);
-        }
-        
-        // validate input
         request()->validate([
             'FirstName' => 'required',
             'LastName' => 'required',
@@ -154,46 +157,45 @@ class StudentsController extends Controller
             'School' => request('School'),
         ]);
 
-        return response()->json([
+        return [
             'success' => $isSuccess,
-            'data' => $student
-        ]);
+        ];
+
     }
 
     /**
      * Remove the specified resource from storage.
      */
-
-    /**
-    * @OA\Delete(
-    *     path="/students/{id}",
-    *     tags={"STUDENTS"},
-    *     summary="Delete a student",
-    *     description="Delete a specific student by ID.",
-    *     @OA\Parameter(
-    *         name="id",
-    *         in="path",
-    *         required=true,
-    *         description="ID of the student to delete",
-    *         @OA\Schema(type="integer")
-    *     ),
-    *     @OA\Response(response=200, description="Student deleted successfully"),
-    *     @OA\Response(response=404, description="Student not found")
-    * )
-    */
-    
-    public function destroy($id)
+    #[OA\Delete(
+        path: '/api/students/{id}',
+        tags: ['Students'],
+        summary: 'Delete a student',
+        parameters: [
+            new OA\Parameter(name: 'id', in: 'path', required: true, description: 'Student ID',
+                schema: new OA\Schema(type: 'integer')),
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Delete result',
+                content: new OA\JsonContent(
+                    properties: [new OA\Property(property: 'success', type: 'boolean')]
+                )
+            ),
+            new OA\Response(response: 404, description: 'Student not found'),
+        ]
+    )]
+    public function destroy(Student $student)
     {
-        $student = Student::find($id);
-        
-        if (!$student) {
-            return response()->json(['message' => 'Student not found'], 404);
-        }
-        
-        $isSuccess = $student->delete();
-    
-        return response()->json([
-            'success' => $isSuccess
-        ]);    
+        $isSuccess = $student->delete([
+            'FirstName' => request('FirstName'),
+            'LastName' => request('LastName'),
+            'School' => request('School'),
+        ]);
+
+        return [
+            'success' => $isSuccess,
+        ];
+
     }
 }

@@ -9,6 +9,6 @@ class Student extends Model
     protected $fillable = [
         'FirstName',
         'LastName',
-        'School'
-    ];    
+        'School',
+    ];
 }
