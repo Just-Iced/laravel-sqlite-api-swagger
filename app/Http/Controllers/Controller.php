@@ -4,13 +4,11 @@ namespace App\Http\Controllers;
 
 use OpenApi\Attributes as OA;
 
-#[
-    OA\Info(version: '1.0.0', description: 'School API Documentation', title: 'School API Documentation'),
-    OA\Server(url: 'http://127.0.0.1:8000/api', description: 'local server'),
-    OA\Server(url: 'https://laravlsqliteswagger.azurewebsites.net/api', description: 'production server'),
-    OA\Server(url: 'https://laravlsqliteswagger.azurewebsites.net/api', description: 'staging server'),
-    OA\SecurityScheme(securityScheme: 'bearerAuth', type: 'http', name: 'Authorization', in: 'header'),
-]
+#[OA\Info(title: 'Laravel Students API',
+    version: '1.0.0',
+    description: 'API for managing students',
+    contact: new OA\Contact(email: 'admin@example.com')
+)]
 abstract class Controller
 {
     //
